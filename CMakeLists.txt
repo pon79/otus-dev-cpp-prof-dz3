@@ -8,7 +8,7 @@ project(allocator LANGUAGES CXX VERSION ${PROJECT_VESRION})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(allocator main.cpp)
+add_executable(allocator main.cpp myallocator.h)
 
 # ======== GOOGLE_TEST start ===========
 #enable_testing()
@@ -25,16 +25,16 @@ add_executable(allocator main.cpp)
 # ======== GOOGLE_TEST end ===========
 
 if (MSVC)
-    target_compile_options(ip_allcotar PRIVATE
+    target_compile_options(allocator PRIVATE
         /W4
     )
 else ()
-    target_compile_options(ip_allcotar PRIVATE
+    target_compile_options(allocator PRIVATE
         -Wall -Wextra -pedantic -Werror
     )
 endif()
 
-install(TARGETS ip_allcotar RUNTIME DESTINATION bin)
+install(TARGETS allocator RUNTIME DESTINATION bin)
 
 
 # ======== DEB pack start ===========
