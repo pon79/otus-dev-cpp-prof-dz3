@@ -27,13 +27,13 @@ public:
         std::free(p);
     }
 
-//    template <class U, class... Args>
-//    void construct(U *p, Args &&...args) {
-//        new (p) U(std::forward<Args>(args)...);
-//    };
+    template <class U, class... Args>
+    void construct(U *p, Args &&...args) {
+        new (p) U(std::forward<Args>(args)...);
+    }
 
-//    template <typename U>
-//	void destroy(U *p) {
-//		p->~U();
-//	}
+    template <typename U>
+    void destroy(U *p) {
+        p->~U();
+    }
 };
