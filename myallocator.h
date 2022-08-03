@@ -17,6 +17,12 @@ public:
     using reference = T &;
     using const_reference = const T &;
 
+    template <typename U>
+    struct rebind {
+        using other = MyAllocator<U>;
+    };
+
+
     T *allocate( std::size_t n ) {
 
         if( n == 0u )
