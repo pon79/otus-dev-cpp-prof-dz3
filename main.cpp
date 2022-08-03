@@ -8,7 +8,7 @@ int main()
     try
     {        
         auto v = std::vector<int, MyAllocator<int>>{};
-        // v.reserve(5);
+        v.reserve(10);
         for (int i = 0; i < 6; ++i) {
             std::cout << "vector size = " << v.size() << std::endl;
             v.emplace_back(i);
