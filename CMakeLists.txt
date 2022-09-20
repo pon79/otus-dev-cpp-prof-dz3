@@ -8,7 +8,7 @@ project(allocator LANGUAGES CXX VERSION ${PROJECT_VESRION})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(allocator main.cpp myallocator.h myvector.h myvector.cpp)
+add_executable(allocator main.cpp myallocator.h myvector.h)
 
 # ======== GOOGLE_TEST start ===========
 #enable_testing()

@@ -4,39 +4,49 @@
 #include <iostream>
 #include <memory>
 
-template<class T>
+template<class T, int N>
 class MyAllocator
 {
-    T* m_p;
-    size_t m_size{0};
-    size_t m_max_size{0};
+    T* m_p;        // use reserve
+    size_t m_step; // the number of elements released at a time
+    size_t m_size;
+    size_t m_max_size;
 
     static_assert (!std::is_same_v<T,void>);
 public:
-    MyAllocator() = default;
-
-    using value_type = T;
+    MyAllocator() : m_p{ nullptr}, m_step{N}, m_size{0}, m_max_size{0} { }
 
     using pointer = T *;
-    using const_pointer = const T *;
+    using value_type = T;
     using reference = T &;
+    using const_pointer = const T *;
     using const_reference = const T &;
 
-    template <typename U>
+    template <class U, int M>
     struct rebind {
-        using other = MyAllocator<U>;
+        using other = MyAllocator<U, M>;
     };
 
-    T *allocate( std::size_t n ) {
+    T *allocate( std::size_t new_max_size ) {
 
-        if( n == 0u )
-            return nullptr;
+//        std::cout << "new_max_size: " << n << std::endl;
 
-        auto p = std::malloc(n * sizeof(T));
+        if( new_max_size < m_max_size )
+            return m_p;
+
+        T *p = std::malloc((new_max_size > N ? new_max_size : N) * sizeof(T));
         if (!p)
             throw std::bad_alloc();
 
-        m_max_size = n;
+        for( size_t index{0}; index < m_size ; ++index) {
+            p[index] = std::move( m_p[index] );
+        }
+
+        for( size_t index{0}; index < m_size ; ++index) {
+            destroy( &m_p[index] );
+        }
+
+        m_max_size = new_max_size;
 
         m_p = reinterpret_cast<T *>(p);
 
@@ -48,32 +58,10 @@ public:
         std::free(p);
     }
 
-    void reserve( std::size_t new_max_size) {
-
-        std::cout << "new_max_size: " << new_max_size << std::endl;
-
-        if( new_max_size <= m_max_size )
-            return ;
-
-        T* p = allocate( new_max_size );
-
-        for( size_t index{0}; index < m_size ; ++index) {
-            p[index] = std::move( m_p[index] );
-        }
-
-        for( size_t index{0}; index < m_size ; ++index) {
-            destroy( m_p[index] );
-        }
-
-        m_max_size = new_max_size;
-
-        m_p = p;
-    }
-
     template <class U, class... Args>
     void construct(U *p, Args &&...args) {
         ++m_size;
-        new (p) U(std::forward<Args>(args)...);
+        new ( (void*) p) U(std::forward<Args>(args)...);
     }
 
     template <typename U>
@@ -83,4 +71,5 @@ public:
         p->~U();
     }
 
+    constexpr size_t max_size(){ return m_max_size; }
 };
